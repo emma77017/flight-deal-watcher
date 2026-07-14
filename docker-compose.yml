@@ -1,0 +1,12 @@
+services:
+  watcher:
+    build: .
+    container_name: flight-watcher
+    restart: unless-stopped      # auto-restarts after crashes AND after Pi reboots
+    environment:
+      - TZ=America/Los_Angeles   # scan times (8:00/20:00) follow this timezone
+    env_file: .env               # FDW_EMAIL + FDW_APP_PASSWORD (never committed)
+    volumes:
+      - ./data:/app/data         # deal-dedup DB survives container rebuilds
+      - ./logs:/app/logs
+      # - ./config.toml:/app/config.toml   # uncomment to customize routes on the Pi

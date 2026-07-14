@@ -1,5 +1,6 @@
 # secrets + personal files stay local
 config.toml
+.env
 IMG_*.PNG
 .venv/
 __pycache__/
