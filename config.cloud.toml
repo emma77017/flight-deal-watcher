@@ -9,7 +9,7 @@ window_end_days = 180
 adults = 2
 seat = "business"
 currency = "USD"
-max_queries_per_run = 500
+max_queries_per_run = 600
 one_way_fallback = true
 delay_seconds = [1.5, 4.0]
 
@@ -120,6 +120,18 @@ max_stops = 0
 departure_step_days = 10
 trip_length_days = [14, 21]
 note = "positioning: fly to Seoul separately"
+
+[[openjaw_routes]]
+legs = [["PVG", "LAX"], ["HNL", "PVG"]]
+departure_step_days = 14
+gap_days = [14, 28]
+note = "open-jaw: LA out, Hawaii home; buy LAX-HNL hop separately"
+
+[[openjaw_routes]]
+legs = [["PVG", "HNL"], ["LAX", "PVG"]]
+departure_step_days = 14
+gap_days = [14, 28]
+note = "open-jaw: Hawaii out, LA home; buy HNL-LAX hop separately"
 
 [email]
 enabled = true

@@ -96,6 +96,29 @@ def build_queries(cfg: dict) -> list[dict]:
             dep += timedelta(days=step)
         per_route.append(qs)
 
+    # open-jaw watches (e.g. into LAX, home from HNL) - priced as two one-way tickets
+    for route in cfg.get("openjaw_routes", []):
+        (o1, d1), (o2, d2) = route["legs"]
+        step = route.get("departure_step_days", 14)
+        gaps = route.get("gap_days", [14, 28])
+        qs = []
+        dep = start
+        while dep <= end:
+            for gap in gaps:
+                qs.append({
+                    "type": "openjaw",
+                    "origin": o1,
+                    "destination": f"{d1}~{o2}",   # out to d1, home from o2
+                    "leg2": [o2, d2],
+                    "dep_date": dep.isoformat(),
+                    "ret_date": (dep + timedelta(days=gap)).isoformat(),
+                    "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
+                    "ow_fallback": False,
+                    "note": route.get("note", "open-jaw"),
+                })
+            dep += timedelta(days=step)
+        per_route.append(qs)
+
     interleaved = []
     while any(per_route):
         for qs in per_route:
@@ -263,7 +286,54 @@ def cmd_scan(args):
         attempted += 1
 
         res, query_deals = None, []
-        for attempt in (1, 2):  # one retry per query so a transient blip doesn't cost a date pair
+        if q.get("type") == "openjaw":
+            # Google won't price open-jaws in the page we scrape; watch as 2 one-ways
+            try:
+                first_dest = q["destination"].split("~")[0]
+                o2, d2 = q["leg2"]
+                res_out = search_round_trip(
+                    q["origin"], first_dest, q["dep_date"], None,
+                    adults=adults, seat=s.get("seat", "business"),
+                    currency=s.get("currency", "USD"), max_stops=q["max_stops"])
+                time.sleep(random.uniform(dmin, dmax))
+                res_ret = search_round_trip(
+                    o2, d2, q["ret_date"], None,
+                    adults=adults, seat=s.get("seat", "business"),
+                    currency=s.get("currency", "USD"), max_stops=q["max_stops"])
+                consecutive_failures = 0
+                if res_out.itineraries and res_ret.itineraries:
+                    cheapest_sum = round((min(i.price_total for i in res_out.itineraries)
+                                          + min(i.price_total for i in res_ret.itineraries)) / adults)
+                    store.record_observation(
+                        run_id, q["origin"], q["destination"], q["dep_date"], q["ret_date"],
+                        "open-jaw combo", None, cheapest_sum, None, None, res_out.url)
+                    log.info("%s: open-jaw as 2 one-ways, cheapest sum $%s/pp", label, f"{cheapest_sum:,}")
+                    d = combine_one_ways(q, res_out, res_ret, deal_cfg, adults)
+                    if d and d["price_pp"] <= deal_cfg["max_price_per_person"]:
+                        query_deals = [d]
+                else:
+                    log.info("%s: open-jaw legs unavailable", label)
+            except SearchError as e:
+                failures += 1
+                consecutive_failures += 1
+                log.warning("%s (open-jaw): %s", label, e)
+                if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                    log.error("%d consecutive failures - aborting run early", consecutive_failures)
+                    break
+            except Exception:
+                failures += 1
+                log.exception("%s: unexpected error (open-jaw)", label)
+            fresh_now = [d for d in query_deals
+                         if store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"])]
+            if fresh_now:
+                pending.extend(fresh_now)
+                if not immediate_sent:
+                    dispatched += dispatch_alerts(cfg, store, fresh_now, adults)
+                    dispatched_keys.update(d["key"] for d in fresh_now)
+                    immediate_sent = True
+            continue
+        if q.get("type") != "openjaw":
+          for attempt in (1, 2):  # one retry per query so a transient blip doesn't cost a date pair
             try:
                 res = search_round_trip(
                     q["origin"], q["destination"], q["dep_date"], q["ret_date"],

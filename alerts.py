@@ -57,8 +57,10 @@ def build_email(deals: list[dict], adults: int) -> tuple[str, str, str]:
             <span style="color:#6b7280;font-size:13px">{stops} · outbound {fmt_duration(d['total_duration_min'])}</span>
           </td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap">
-            <b style="font-size:16px">${d['price_pp']:,}</b><span style="color:#6b7280">/person</span><br>
-            <span style="color:#6b7280;font-size:12px">typical {typical}</span>
+            <b style="font-size:16px">${d['price_pp']:,}</b><span style="color:#6b7280">/person
+            {'(2 one-way tickets)' if d.get('url_ret') else 'round trip'}</span><br>
+            <span style="color:#6b7280;font-size:12px">Google shows ${d['price_pp'] * adults:,} = total for {adults}</span><br>
+            <span style="color:#6b7280;font-size:12px">typical {typical}/person</span>
           </td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb">
             <a href="{d['url']}" style="color:#2563eb">Open in Google Flights</a>
