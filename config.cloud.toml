@@ -1,0 +1,142 @@
+# Cloud (GitHub Actions) configuration - same watch rules as the local Mac copy,
+# but credentials/addresses come from repo secrets (FDW_EMAIL / FDW_APP_PASSWORD env)
+# and phone channels are off (no Messages.app in the cloud; email push reaches the
+# phone via the Gmail app instead).
+
+[search]
+window_start_days = 21
+window_end_days = 180
+adults = 2
+seat = "business"
+currency = "USD"
+max_queries_per_run = 500
+one_way_fallback = true
+delay_seconds = [1.5, 4.0]
+
+[deal]
+max_price_per_person = 3800
+max_stops = 1
+min_layover_minutes = 90
+max_layover_minutes = 360
+max_total_hours = 26
+re_alert_drop = 100
+
+[[routes]]
+origin = "PVG"
+destination = "LAX"
+departure_step_days = 7
+trip_length_days = [14, 21, 28]
+
+[[routes]]
+origin = "HGH"
+destination = "LAX"
+departure_step_days = 10
+trip_length_days = [14, 28]
+
+[[routes]]
+origin = "PVG"
+destination = "SFO"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "SEA"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "JFK"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "EWR"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "ORD"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "DTW"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "DFW"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "PVG"
+destination = "HNL"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+one_way_fallback = false
+note = "nonstop from Shanghai"
+
+[[routes]]
+origin = "NRT"
+destination = "LAX"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+note = "positioning: fly to Tokyo separately"
+
+[[routes]]
+origin = "ICN"
+destination = "LAX"
+max_stops = 0
+departure_step_days = 10
+trip_length_days = [14, 21]
+note = "positioning: fly to Seoul separately"
+
+[email]
+enabled = true
+to = ""            # overridden by FDW_EMAIL secret
+smtp_host = "smtp.gmail.com"
+smtp_port = 587
+username = ""      # overridden by FDW_EMAIL secret
+app_password = ""  # overridden by FDW_APP_PASSWORD secret
+
+[sms]
+enabled = false
+phone_number = ""
+
+[imessage]
+enabled = false
+phone_number = ""
+
+[notify]
+macos = false
+stale_hours = 30

@@ -1,0 +1,10 @@
+# secrets + personal files stay local
+config.toml
+IMG_*.PNG
+.venv/
+__pycache__/
+*.pyc
+logs/
+data/
+.DS_Store
+run_watcher.sh.log
