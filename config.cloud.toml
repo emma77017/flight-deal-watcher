@@ -9,7 +9,7 @@ window_end_days = 180
 adults = 2
 seat = "business"
 currency = "USD"
-max_queries_per_run = 700
+max_queries_per_run = 750
 one_way_fallback = true
 delay_seconds = [1.5, 4.0]
 
@@ -123,33 +123,63 @@ note = "positioning: fly to Seoul separately"
 
 [[openjaw_routes]]
 legs = [["PVG", "LAX"], ["HNL", "PVG"]]
-departure_step_days = 14
+departure_step_days = 21
 gap_days = [14, 28]
 note = "open-jaw: LA out, Hawaii home; buy LAX-HNL hop separately"
 
 [[openjaw_routes]]
 legs = [["PVG", "HNL"], ["LAX", "PVG"]]
-departure_step_days = 14
+departure_step_days = 21
 gap_days = [14, 28]
 note = "open-jaw: Hawaii out, LA home; buy HNL-LAX hop separately"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["LAX", "PVG"]]
-departure_step_days = 14
+departure_step_days = 21
 gap_days = [14, 28]
 note = "open-jaw: Tokyo out, home direct to Shanghai"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["LAX", "HGH"]]
-departure_step_days = 14
+departure_step_days = 21
 gap_days = [14, 28]
 note = "open-jaw: Tokyo out, home direct to Hangzhou"
 
 [[openjaw_routes]]
 legs = [["ICN", "LAX"], ["LAX", "PVG"]]
-departure_step_days = 14
+departure_step_days = 21
 gap_days = [14, 28]
 note = "open-jaw: Seoul out, home direct to Shanghai"
+
+
+# US-side open-jaws: nonstop into one gateway, nonstop home from another (LA-anchored).
+[[openjaw_routes]]
+legs = [["PVG", "SFO"], ["LAX", "PVG"]]
+departure_step_days = 21
+gap_days = [14, 28]
+max_stops = 0
+note = "open-jaw: SF in, LA home, all nonstop"
+
+[[openjaw_routes]]
+legs = [["PVG", "SEA"], ["LAX", "PVG"]]
+departure_step_days = 21
+gap_days = [14, 28]
+max_stops = 0
+note = "open-jaw: Seattle in, LA home, all nonstop"
+
+[[openjaw_routes]]
+legs = [["PVG", "LAX"], ["SFO", "PVG"]]
+departure_step_days = 21
+gap_days = [14, 28]
+max_stops = 0
+note = "open-jaw: LA in, SF home, all nonstop"
+
+[[openjaw_routes]]
+legs = [["PVG", "LAX"], ["SEA", "PVG"]]
+departure_step_days = 21
+gap_days = [14, 28]
+max_stops = 0
+note = "open-jaw: LA in, Seattle home, all nonstop"
 
 [email]
 enabled = true
