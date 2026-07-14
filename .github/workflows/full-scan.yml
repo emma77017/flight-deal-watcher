@@ -11,7 +11,7 @@ on:
         default: "scan"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: flight-watcher
@@ -26,6 +26,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      # alert-dedup DB rides the actions cache between runs; worst case on cache
+      # eviction is a duplicate alert, never a missed one
+      - uses: actions/cache@v4
+        with:
+          path: data
+          key: watcher-state-${{ github.run_id }}
+          restore-keys: watcher-state-
       - run: pip install -r requirements.txt
       - run: cp config.cloud.toml config.toml
       - name: scan
@@ -33,13 +40,3 @@ jobs:
           FDW_EMAIL: ${{ secrets.EMAIL_ADDRESS }}
           FDW_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python watcher.py ${{ inputs.args || 'scan' }}
-      - name: persist alert-dedup state
-        if: always()
-        run: |
-          git config user.name "flight-watcher-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data/watcher.db logs/deals.log 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "state: $(date -u +%Y-%m-%d_%H%M) [skip ci]"
-            git push || (git pull --rebase -X theirs && git push) || echo "state push failed (will re-alert, never lose)"
-          fi
