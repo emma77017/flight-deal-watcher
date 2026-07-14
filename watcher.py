@@ -108,7 +108,9 @@ def build_queries(cfg: dict) -> list[dict]:
                 qs.append({
                     "type": "openjaw",
                     "origin": o1,
-                    "destination": f"{d1}~{o2}",   # out to d1, home from o2
+                    # out to d1; "~X" = return departs X (or lands at X when the
+                    # return leaves from the same city we flew into)
+                    "destination": f"{d1}~{d2 if o2 == d1 else o2}",
                     "leg2": [o2, d2],
                     "dep_date": dep.isoformat(),
                     "ret_date": (dep + timedelta(days=gap)).isoformat(),
