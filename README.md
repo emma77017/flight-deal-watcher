@@ -62,11 +62,12 @@ fail, it re-fires every run until one gets through. Test with
 The same code runs on GitHub Actions so scans continue when the Mac is closed:
 `full-scan.yml` (8:05 AM/PM Pacific) + `pulse-scan.yml` (every 2 h), using
 `config.cloud.toml` + repo secrets `EMAIL_ADDRESS` / `GMAIL_APP_PASSWORD`.
-Each run commits `data/watcher.db` back to the repo so deals aren't re-alerted
-every run. Cloud and Mac dedup independently — a deal both of them see produces
-one email from each, which is intentional redundancy. If you change routes or
-thresholds, edit BOTH `config.toml` (local) and `config.cloud.toml` (cloud),
-then `git push`.
+The alert-dedup DB rides the Actions cache between runs (worst case on cache
+eviction: a duplicate alert, never a missed one). Each scanner (cloud, Mac,
+Raspberry Pi — see `PI_SETUP.md`) dedups independently — a deal seen by all
+produces one email from each, which is intentional redundancy. If you change
+routes or thresholds, edit BOTH `config.toml` (local) and `config.cloud.toml`
+(cloud/Pi), then `git push`.
 
 ## Tuning (edit `config.toml`, no restart needed)
 
