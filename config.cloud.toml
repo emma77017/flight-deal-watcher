@@ -226,4 +226,7 @@ feeds = [
   "https://www.secretflying.com/feed",
 ]
 keywords_cabin = ["商务舱", "公务舱", "头等舱", "business", "polaris", "first class"]
-keywords_route = ["上海", "杭州", "浦东", "美国", "北美", "洛杉矶", "西雅图", "旧金山", "夏威夷", "东京", "首尔", "shanghai", "hangzhou", "china", "los angeles", "lax", "seattle", "san francisco", "hawaii", "honolulu", "tokyo", "seoul", "north america", "transpacific"]
+keywords_origin = ["上海", "杭州", "浦东", "东京", "成田", "首尔", "仁川", "中国", "shanghai", "hangzhou", "pvg", "tokyo", "narita", "seoul", "incheon", "china"]
+keywords_dest = ["美国", "北美", "洛杉矶", "西雅图", "旧金山", "夏威夷", "檀香山", "圣地亚哥", "los angeles", "lax", "seattle", "san francisco", "hawaii", "honolulu", "san diego", "usa", "united states", "north america", "transpacific"]
+promo_max_usd = 3800   # email only when a post names a price at/under this
+cny_per_usd = 7.2

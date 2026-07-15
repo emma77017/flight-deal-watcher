@@ -553,18 +553,26 @@ def cmd_promos(_args):
         log.info("promo watch disabled on this machine")
         return
     from promos import check_promos
-    hits = check_promos(cfg, BASE)
-    if not hits:
-        log.info("no new promo posts")
+    fits, others = check_promos(cfg, BASE)
+    # everything matched gets remembered (logged), only criteria-fits get emailed
+    if fits or others:
+        with open(BASE / "logs" / "promos.log", "a") as f:
+            from datetime import date
+            for h in fits + others:
+                price = f"${h['best_price_usd']:,}" if h.get("best_price_usd") else "no price parsed"
+                f.write(f"{date.today()} [{'FIT' if h in fits else 'seen'}] {price}  {h['title']}\n"
+                        f"    {h['link']}\n")
+    if not fits:
+        log.info("promo check: %d matched posts logged, none fit the criteria - no email", len(others))
         return
-    log.info("%d new promo post(s) matching keywords", len(hits))
-    text = "New premium-cabin promo posts matching your routes:\n\n" + "\n\n".join(
-        f"• {h['title']}\n  {h['link']}" for h in hits)
+    log.info("PROMO FIT: %d post(s) meet criteria", len(fits))
+    text = "Promo announcement(s) matching your route + cabin + budget:\n\n" + "\n\n".join(
+        f"• {h['title']}\n  best price seen: ${h['best_price_usd']:,}/person\n  {h['link']}" for h in fits)
     try:
-        alerts.send_plain(cfg, f"📰 {len(hits)} new flight-promo post(s) worth reading", text)
+        alerts.send_plain(cfg, f"🎯 Promo fits your criteria: {fits[0]['title'][:80]}", text)
     except Exception as e:
         log.error("promo email failed: %s", e)
-    alerts.macos_notify("📰 Flight promo posts", hits[0]["title"][:200])
+    alerts.macos_notify("🎯 Promo fits your criteria!", fits[0]["title"][:200])
 
 
 def cmd_test_notify(_args):
