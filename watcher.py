@@ -545,6 +545,28 @@ def cmd_test_email(_args):
         print("Email is not configured yet. Put your Gmail app password in config.toml under [email].")
 
 
+def cmd_promos(_args):
+    """Check deal-blog feeds for new premium-cabin promo announcements."""
+    import os
+    cfg = load_config()
+    if not (cfg.get("promos", {}).get("enabled") or os.getenv("FDW_PROMOS") == "1"):
+        log.info("promo watch disabled on this machine")
+        return
+    from promos import check_promos
+    hits = check_promos(cfg, BASE)
+    if not hits:
+        log.info("no new promo posts")
+        return
+    log.info("%d new promo post(s) matching keywords", len(hits))
+    text = "New premium-cabin promo posts matching your routes:\n\n" + "\n\n".join(
+        f"• {h['title']}\n  {h['link']}" for h in hits)
+    try:
+        alerts.send_plain(cfg, f"📰 {len(hits)} new flight-promo post(s) worth reading", text)
+    except Exception as e:
+        log.error("promo email failed: %s", e)
+    alerts.macos_notify("📰 Flight promo posts", hits[0]["title"][:200])
+
+
 def cmd_test_notify(_args):
     alerts.macos_notify("✈️ Flight Deal Watcher", "Test notification - alerts are working!")
     print("Notification sent (check the banner / Notification Center).")
@@ -565,11 +587,12 @@ def main():
     scan.add_argument("--pulse", action="store_true")
     scan.add_argument("--limit", type=int)
     scan.add_argument("--route")
-    for name in ("report", "status", "healthcheck", "test-email", "test-notify", "test-sms"):
+    for name in ("report", "status", "healthcheck", "promos", "test-email", "test-notify", "test-sms"):
         sub.add_parser(name)
     args = p.parse_args()
     {"scan": cmd_scan, "report": cmd_report, "status": cmd_status, "healthcheck": cmd_healthcheck,
-     "test-email": cmd_test_email, "test-notify": cmd_test_notify, "test-sms": cmd_test_sms}[args.cmd](args)
+     "promos": cmd_promos, "test-email": cmd_test_email, "test-notify": cmd_test_notify,
+     "test-sms": cmd_test_sms}[args.cmd](args)
 
 
 if __name__ == "__main__":

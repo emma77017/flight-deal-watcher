@@ -25,20 +25,20 @@ re_alert_drop = 100
 origin = "PVG"
 destination = "LAX"
 departure_step_days = 7
-trip_length_days = [14, 21, 28]
+trip_length_days = [21, 25, 31]
 
 [[routes]]
 origin = "HGH"
 destination = "LAX"
 departure_step_days = 10
-trip_length_days = [14, 28]
+trip_length_days = [21, 28]
 
 [[routes]]
 origin = "PVG"
 destination = "SFO"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -47,7 +47,7 @@ origin = "PVG"
 destination = "SEA"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -56,7 +56,7 @@ origin = "PVG"
 destination = "JFK"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -65,7 +65,7 @@ origin = "PVG"
 destination = "EWR"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -74,7 +74,7 @@ origin = "PVG"
 destination = "ORD"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -83,7 +83,7 @@ origin = "PVG"
 destination = "DTW"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -92,7 +92,7 @@ origin = "PVG"
 destination = "DFW"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -101,7 +101,7 @@ origin = "PVG"
 destination = "HNL"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 one_way_fallback = false
 note = "nonstop from Shanghai"
 
@@ -110,7 +110,7 @@ origin = "NRT"
 destination = "LAX"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 note = "positioning: fly to Tokyo separately"
 
 [[routes]]
@@ -118,78 +118,78 @@ origin = "ICN"
 destination = "LAX"
 max_stops = 0
 departure_step_days = 10
-trip_length_days = [14, 21]
+trip_length_days = [21, 28]
 note = "positioning: fly to Seoul separately"
 
 [[openjaw_routes]]
 legs = [["PVG", "LAX"], ["HNL", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: LA out, Hawaii home; buy LAX-HNL hop separately"
 
 [[openjaw_routes]]
 legs = [["PVG", "HNL"], ["LAX", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: Hawaii out, LA home; buy HNL-LAX hop separately"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["LAX", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: Tokyo out, home direct to Shanghai"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["LAX", "HGH"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: Tokyo out, home direct to Hangzhou"
 
 [[openjaw_routes]]
 legs = [["ICN", "LAX"], ["LAX", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: Seoul out, home direct to Shanghai"
 
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["HNL", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: Tokyo out to LA; Hawaii stay on the way home to Shanghai"
 
 [[openjaw_routes]]
 legs = [["ICN", "LAX"], ["HNL", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 note = "open-jaw: Seoul out to LA; Hawaii stay on the way home to Shanghai"
 
 # US-side open-jaws: nonstop into one gateway, nonstop home from another (LA-anchored).
 [[openjaw_routes]]
 legs = [["PVG", "SFO"], ["LAX", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 max_stops = 0
 note = "open-jaw: SF in, LA home, all nonstop"
 
 [[openjaw_routes]]
 legs = [["PVG", "SEA"], ["LAX", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 max_stops = 0
 note = "open-jaw: Seattle in, LA home, all nonstop"
 
 [[openjaw_routes]]
 legs = [["PVG", "LAX"], ["SFO", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 max_stops = 0
 note = "open-jaw: LA in, SF home, all nonstop"
 
 [[openjaw_routes]]
 legs = [["PVG", "LAX"], ["SEA", "PVG"]]
 departure_step_days = 21
-gap_days = [14, 28]
+gap_days = [21, 28]
 max_stops = 0
 note = "open-jaw: LA in, Seattle home, all nonstop"
 
@@ -212,3 +212,18 @@ phone_number = ""
 [notify]
 macos = false
 stale_hours = 30
+
+[promos]
+# Announcement watcher: reads the deal blogs that broke every historical promo
+# (piao.tips / pointstalent are the WeChat outlets behind screenshots like the
+# Tokyo-Seattle one). Enabled on the Pi via FDW_PROMOS=1; off elsewhere to avoid
+# duplicate emails.
+enabled = false
+feeds = [
+  "https://piao.tips/feed",
+  "https://www.pointstalent.com/feed",
+  "https://sky-budget.com/feed",
+  "https://www.secretflying.com/feed",
+]
+keywords_cabin = ["商务舱", "公务舱", "头等舱", "business", "polaris", "first class"]
+keywords_route = ["上海", "杭州", "浦东", "美国", "北美", "洛杉矶", "西雅图", "旧金山", "夏威夷", "东京", "首尔", "shanghai", "hangzhou", "china", "los angeles", "lax", "seattle", "san francisco", "hawaii", "honolulu", "tokyo", "seoul", "north america", "transpacific"]

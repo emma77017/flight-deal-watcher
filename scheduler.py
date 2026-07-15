@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 FULL_HOURS = (8, 20)
 HEALTH_HOUR = 12
 PULSE_EVERY_MIN = 120
+PROMO_EVERY_MIN = 360  # promo-blog feed check every 6h (no-op unless FDW_PROMOS=1)
 
 
 def run(*args: str):
@@ -32,8 +33,12 @@ def main():
     done: set = set()  # (date, marker) so each daily slot fires exactly once
     run("scan", "--pulse")  # catch up immediately on (re)start
     last_pulse = time.time()
+    last_promo = 0.0
 
     while True:
+        if time.time() - last_promo >= PROMO_EVERY_MIN * 60:
+            run("promos")
+            last_promo = time.time()
         now = datetime.now()
         done = {m for m in done if m[0] >= now.date() - timedelta(days=1)}
 
