@@ -109,6 +109,7 @@ note = "nonstop from Shanghai"
 origin = "NRT"
 destination = "LAX"
 max_stops = 0
+alert_below = 3000
 departure_step_days = 10
 trip_length_days = [21, 28]
 note = "positioning: fly to Tokyo separately"
@@ -117,6 +118,7 @@ note = "positioning: fly to Tokyo separately"
 origin = "ICN"
 destination = "LAX"
 max_stops = 0
+alert_below = 3000
 departure_step_days = 10
 trip_length_days = [21, 28]
 note = "positioning: fly to Seoul separately"
@@ -135,18 +137,21 @@ note = "open-jaw: Hawaii out, LA home; buy HNL-LAX hop separately"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["LAX", "PVG"]]
+alert_below = 3000
 departure_step_days = 21
 gap_days = [21, 28]
 note = "open-jaw: Tokyo out, home direct to Shanghai"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["LAX", "HGH"]]
+alert_below = 3000
 departure_step_days = 21
 gap_days = [21, 28]
 note = "open-jaw: Tokyo out, home direct to Hangzhou"
 
 [[openjaw_routes]]
 legs = [["ICN", "LAX"], ["LAX", "PVG"]]
+alert_below = 3000
 departure_step_days = 21
 gap_days = [21, 28]
 note = "open-jaw: Seoul out, home direct to Shanghai"
@@ -154,12 +159,14 @@ note = "open-jaw: Seoul out, home direct to Shanghai"
 
 [[openjaw_routes]]
 legs = [["NRT", "LAX"], ["HNL", "PVG"]]
+alert_below = 3000
 departure_step_days = 21
 gap_days = [21, 28]
 note = "open-jaw: Tokyo out to LA; Hawaii stay on the way home to Shanghai"
 
 [[openjaw_routes]]
 legs = [["ICN", "LAX"], ["HNL", "PVG"]]
+alert_below = 3000
 departure_step_days = 21
 gap_days = [21, 28]
 note = "open-jaw: Seoul out to LA; Hawaii stay on the way home to Shanghai"

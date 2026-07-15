@@ -91,6 +91,7 @@ def build_queries(cfg: dict) -> list[dict]:
                     "ret_date": (dep + timedelta(days=length)).isoformat(),
                     "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
                     "ow_fallback": route.get("one_way_fallback", True),
+                    "alert_below": route.get("alert_below", cfg["deal"]["max_price_per_person"]),
                     "note": route.get("note", ""),
                 })
             dep += timedelta(days=step)
@@ -116,6 +117,7 @@ def build_queries(cfg: dict) -> list[dict]:
                     "ret_date": (dep + timedelta(days=gap)).isoformat(),
                     "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
                     "ow_fallback": False,
+                    "alert_below": route.get("alert_below", cfg["deal"]["max_price_per_person"]),
                     "note": route.get("note", "open-jaw"),
                 })
             dep += timedelta(days=step)
@@ -145,10 +147,10 @@ def itinerary_ok(it, deal_cfg) -> bool:
     return it.total_duration_min <= deal_cfg["max_total_hours"] * 60
 
 
-def qualify(it, deal_cfg, adults) -> dict | None:
+def qualify(it, deal_cfg, adults, alert_below=None) -> dict | None:
     """Check a round-trip-priced itinerary against the deal rules; return a deal dict or None."""
     price_pp = round(it.price_total / adults)
-    if price_pp > deal_cfg["max_price_per_person"] or not itinerary_ok(it, deal_cfg):
+    if price_pp > (alert_below or deal_cfg["max_price_per_person"]) or not itinerary_ok(it, deal_cfg):
         return None
     return {
         "price_pp": price_pp,
@@ -184,7 +186,9 @@ def combine_one_ways(q, res_out, res_ret, deal_cfg, adults) -> dict | None:
         "url": res_out.url, "url_ret": res_ret.url,
         "note": (q["note"] + "; " if q["note"] else "")
                 + f"two one-way tickets; return {'/'.join(r.airlines)}{ret_stop}",
-        "key": f"{q['origin']}-{q['destination']}|{q['dep_date']}|{q['ret_date']}|"
+        # dates deliberately NOT in the key: the same flight combo on other dates
+        # is the same deal - alert once, re-alert only on a real price drop
+        "key": f"{q['origin']}-{q['destination']}|"
                f"OW:{'/'.join(sorted(o.airlines))}+{'/'.join(sorted(r.airlines))}",
     }
 
@@ -311,7 +315,7 @@ def cmd_scan(args):
                         "open-jaw combo", None, cheapest_sum, None, None, res_out.url)
                     log.info("%s: open-jaw as 2 one-ways, cheapest sum $%s/pp", label, f"{cheapest_sum:,}")
                     d = combine_one_ways(q, res_out, res_ret, deal_cfg, adults)
-                    if d and d["price_pp"] <= deal_cfg["max_price_per_person"]:
+                    if d and d["price_pp"] <= q["alert_below"]:
                         query_deals = [d]
                 else:
                     log.info("%s: open-jaw legs unavailable", label)
@@ -326,7 +330,8 @@ def cmd_scan(args):
                 failures += 1
                 log.exception("%s: unexpected error (open-jaw)", label)
             fresh_now = [d for d in query_deals
-                         if store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"])]
+                         if store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"],
+                                       repeat_hours=24 if d.get("golden") else None)]
             if fresh_now:
                 pending.extend(fresh_now)
                 if not immediate_sent:
@@ -377,7 +382,7 @@ def cmd_scan(args):
 
                 best_per_airline = {}
                 for it in res.itineraries:
-                    d = qualify(it, deal_cfg, adults)
+                    d = qualify(it, deal_cfg, adults, q["alert_below"])
                     if d is None:
                         continue
                     akey = "/".join(sorted(it.airlines))
@@ -388,7 +393,10 @@ def cmd_scan(args):
                         "dep_date": q["dep_date"], "ret_date": q["ret_date"],
                         "typical_low_pp": t_low, "typical_high_pp": t_high,
                         "url": res.url, "note": q["note"],
-                        "key": f"{q['origin']}-{q['destination']}|{q['dep_date']}|{q['ret_date']}|{akey}",
+                        # same flight on other dates = same deal (no dates in key)
+                        "key": f"{q['origin']}-{q['destination']}|{akey}",
+                        # the golden deal - Shanghai-LA nonstop - may repeat daily
+                        "golden": q["origin"] == "PVG" and q["destination"] == "LAX" and d["stops"] == 0,
                     })
                     best_per_airline[akey] = d
                 query_deals = list(best_per_airline.values())
@@ -413,7 +421,7 @@ def cmd_scan(args):
                         "one-way combo", None, cheapest_sum, None, None, res_out.url)
                     log.info("%s: priced as 2 one-ways, cheapest sum $%s/pp", label, f"{cheapest_sum:,}")
                     d = combine_one_ways(q, res_out, res_ret, deal_cfg, adults)
-                    if d and d["price_pp"] <= deal_cfg["max_price_per_person"]:
+                    if d and d["price_pp"] <= q["alert_below"]:
                         query_deals = [d]
                 else:
                     log.info("%s: no flights (even as one-ways)", label)
@@ -427,7 +435,8 @@ def cmd_scan(args):
             log.exception("%s: unexpected error while processing results", label)
 
         fresh_now = [d for d in query_deals
-                     if store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"])]
+                     if store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"],
+                                       repeat_hours=24 if d.get("golden") else None)]
         if fresh_now:
             pending.extend(fresh_now)
             if not immediate_sent:
@@ -440,7 +449,8 @@ def cmd_scan(args):
     # are excluded here and simply re-fire on the next run
     remaining = [d for d in pending
                  if d["key"] not in dispatched_keys
-                 and store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"])]
+                 and store.should_alert(d["key"], d["price_pp"], deal_cfg["re_alert_drop"],
+                                       repeat_hours=24 if d.get("golden") else None)]
     if remaining:
         dispatched += dispatch_alerts(cfg, store, remaining, adults)
     elif not pending:

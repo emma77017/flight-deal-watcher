@@ -59,11 +59,24 @@ class Store:
         )
         self.db.commit()
 
-    def should_alert(self, key: str, price_pp: int, re_alert_drop: int) -> bool:
-        row = self.db.execute("SELECT last_price_pp FROM alerts WHERE key=?", (key,)).fetchone()
+    def should_alert(self, key: str, price_pp: int, re_alert_drop: int,
+                     repeat_hours: float | None = None) -> bool:
+        """True for never-alerted keys and meaningful price drops. repeat_hours
+        lets 'golden' deals re-fire after that many hours even at the same price."""
+        row = self.db.execute(
+            "SELECT last_price_pp, last_alerted_at FROM alerts WHERE key=?", (key,)).fetchone()
         if row is None:
             return True
-        return price_pp <= row[0] - re_alert_drop
+        if price_pp <= row[0] - re_alert_drop:
+            return True
+        if repeat_hours:
+            try:
+                last = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=timezone.utc)
+                if (datetime.now(timezone.utc) - last).total_seconds() >= repeat_hours * 3600:
+                    return True
+            except Exception:
+                pass
+        return False
 
     def mark_alerted(self, key: str, price_pp: int):
         self.db.execute(
