@@ -9,7 +9,7 @@ window_end_days = 180
 adults = 2
 seat = "business"
 currency = "USD"
-max_queries_per_run = 750
+max_queries_per_run = 800
 one_way_fallback = true
 delay_seconds = [1.5, 4.0]
 
@@ -151,6 +151,18 @@ departure_step_days = 21
 gap_days = [14, 28]
 note = "open-jaw: Seoul out, home direct to Shanghai"
 
+
+[[openjaw_routes]]
+legs = [["NRT", "LAX"], ["HNL", "PVG"]]
+departure_step_days = 21
+gap_days = [14, 28]
+note = "open-jaw: Tokyo out to LA; Hawaii stay on the way home to Shanghai"
+
+[[openjaw_routes]]
+legs = [["ICN", "LAX"], ["HNL", "PVG"]]
+departure_step_days = 21
+gap_days = [14, 28]
+note = "open-jaw: Seoul out to LA; Hawaii stay on the way home to Shanghai"
 
 # US-side open-jaws: nonstop into one gateway, nonstop home from another (LA-anchored).
 [[openjaw_routes]]
