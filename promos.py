@@ -21,6 +21,8 @@ CNY_RE = [
     re.compile(r"([\d,]{4,7})\s*(?:人民币|元(?!旦))"),
 ]
 WAN_RE = re.compile(r"([\d.]{1,4})\s*万")
+W_SHORT_RE = re.compile(r"(\d)\s*[wW]\s*(\d)?")      # "1w8" = ¥18,000
+RT_BARE_RE = re.compile(r"往返\s*\$?([\d,]{4})")      # "往返4300+" - USD context
 
 
 def _prices_usd(text: str, cny_per_usd: float) -> list[int]:
@@ -43,7 +45,25 @@ def _prices_usd(text: str, cny_per_usd: float) -> list[int]:
             continue
         if 9000 <= v <= 150000:
             vals.append(round(v / cny_per_usd))
+    for m in W_SHORT_RE.findall(text):
+        v = int(m[0]) * 10000 + (int(m[1]) * 1000 if m[1] else 0)
+        if 9000 <= v <= 60000:
+            vals.append(round(v / cny_per_usd))
+    for m in RT_BARE_RE.findall(text):
+        v = int(m.replace(",", ""))
+        if 1500 <= v <= 9999:
+            vals.append(v)
     return vals
+
+
+# posts about the wrong direction (US -> China) are knowledge, not alerts
+REVERSE_PATTERNS = ["美国直飞中国", "美国出发", "从美国", "美国回国", "us to china", "回国商务"]
+FORWARD_PATTERNS = ["赴美", "飞美国", "到美国", "直飞美国", "上海", "杭州", "浦东", "东京", "成田",
+                    "首尔", "仁川", "shanghai", "hangzhou", "tokyo", "seoul"]
+
+
+def _is_reverse_direction(text: str) -> bool:
+    return any(r in text for r in REVERSE_PATTERNS) and not any(f in text for f in FORWARD_PATTERNS)
 
 
 def check_promos(cfg: dict, base: Path) -> tuple[list[dict], list[dict]]:
@@ -84,7 +104,7 @@ def check_promos(cfg: dict, base: Path) -> tuple[list[dict], list[dict]]:
                 prices = _prices_usd(text, cny_per_usd)
                 hit = {"title": title, "link": link,
                        "best_price_usd": min(prices) if prices else None}
-                if prices and min(prices) <= max_usd:
+                if prices and min(prices) <= max_usd and not _is_reverse_direction(text):
                     fits.append(hit)
                 else:
                     others.append(hit)
