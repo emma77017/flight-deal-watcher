@@ -73,6 +73,12 @@ def check_promos(cfg: dict, base: Path) -> tuple[list[dict], list[dict]]:
     cabin_kw = [k.lower() for k in p.get("keywords_cabin", [])]
     origin_kw = [k.lower() for k in p.get("keywords_origin", [])]
     dest_kw = [k.lower() for k in p.get("keywords_dest", [])]
+    # Emma's rule: LA/San Diego area works from ANY approved origin; every other
+    # US destination only counts when the origin is Shanghai/Hangzhou itself.
+    sh_origin_kw = [k.lower() for k in p.get("keywords_origin_shanghai",
+                    ["上海", "浦东", "杭州", "shanghai", "hangzhou", "pvg", "hgh"])]
+    socal_kw = [k.lower() for k in p.get("keywords_dest_socal",
+                ["洛杉矶", "圣地亚哥", "los angeles", "lax", "san diego", "orange county", "安大略"])]
     max_usd = p.get("promo_max_usd") or cfg.get("deal", {}).get("max_price_per_person", 3800)
     cny_per_usd = p.get("cny_per_usd", 7.2)
 
@@ -104,7 +110,10 @@ def check_promos(cfg: dict, base: Path) -> tuple[list[dict], list[dict]]:
                 prices = _prices_usd(text, cny_per_usd)
                 hit = {"title": title, "link": link,
                        "best_price_usd": min(prices) if prices else None}
-                if prices and min(prices) <= max_usd and not _is_reverse_direction(text):
+                route_fits = (any(k in text for k in socal_kw)
+                              or any(k in text for k in sh_origin_kw))
+                if (route_fits and prices and min(prices) <= max_usd
+                        and not _is_reverse_direction(text)):
                     fits.append(hit)
                 else:
                     others.append(hit)
