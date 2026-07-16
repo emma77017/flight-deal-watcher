@@ -56,14 +56,14 @@ def _prices_usd(text: str, cny_per_usd: float) -> list[int]:
     return vals
 
 
-# posts about the wrong direction (US -> China) are knowledge, not alerts
-REVERSE_PATTERNS = ["美国直飞中国", "美国出发", "从美国", "美国回国", "us to china", "回国商务"]
-FORWARD_PATTERNS = ["赴美", "飞美国", "到美国", "直飞美国", "上海", "杭州", "浦东", "东京", "成田",
-                    "首尔", "仁川", "shanghai", "hangzhou", "tokyo", "seoul"]
+# US -> Asia posts serve Emma & husband's own trip (LAX->PVG/TYO/HKG, bar $3,500);
+# Asia -> US posts serve the parents' trip (existing route rules, bar $3,800)
+US_ORIGIN_PATTERNS = ["美国直飞中国", "美国出发", "从美国", "美国回国", "us to china",
+                      "回国商务", "全美", "直飞中国"]
 
 
-def _is_reverse_direction(text: str) -> bool:
-    return any(r in text for r in REVERSE_PATTERNS) and not any(f in text for f in FORWARD_PATTERNS)
+def _is_us_origin(text: str) -> bool:
+    return any(r in text for r in US_ORIGIN_PATTERNS)
 
 
 def check_promos(cfg: dict, base: Path) -> tuple[list[dict], list[dict]]:
@@ -110,10 +110,16 @@ def check_promos(cfg: dict, base: Path) -> tuple[list[dict], list[dict]]:
                 prices = _prices_usd(text, cny_per_usd)
                 hit = {"title": title, "link": link,
                        "best_price_usd": min(prices) if prices else None}
-                route_fits = (any(k in text for k in socal_kw)
-                              or any(k in text for k in sh_origin_kw))
-                if (route_fits and prices and min(prices) <= max_usd
-                        and not _is_reverse_direction(text)):
+                if _is_us_origin(text):
+                    # Emma & husband's direction: US -> China/Japan/HKG
+                    route_ok = True
+                    bar = min(max_usd, p.get("us_origin_max_usd", 3500))
+                else:
+                    # parents' direction: needs SoCal destination or Shanghai origin
+                    route_ok = (any(k in text for k in socal_kw)
+                                or any(k in text for k in sh_origin_kw))
+                    bar = max_usd
+                if route_ok and prices and min(prices) <= bar:
                     fits.append(hit)
                 else:
                     others.append(hit)
