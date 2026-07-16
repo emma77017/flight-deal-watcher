@@ -9,7 +9,7 @@ window_end_days = 180
 adults = 2
 seat = "business"
 currency = "USD"
-max_queries_per_run = 1300
+max_queries_per_run = 1400
 one_way_fallback = true
 delay_seconds = [1.5, 4.0]
 
