@@ -571,6 +571,26 @@ def cmd_test_email(_args):
         print("Email is not configured yet. Put your Gmail app password in config.toml under [email].")
 
 
+def cmd_heartbeat(_args):
+    """Weekly proof-of-life email (scheduled on the Pi): silence must never be
+    mistaken for health."""
+    cfg = load_config()
+    store = Store(BASE / "data" / "watcher.db")
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%SZ")
+    week = [r for r in store.recent_runs(400) if r[1] and r[1] >= cutoff]
+    completed = sum(1 for r in week if r[2])
+    failures = sum(r[4] or 0 for r in week)
+    delivered = sum(r[6] or 0 for r in week)
+    text = (f"Watcher alive on the Pi: {completed} scans completed in the last 7 days, "
+            f"{failures} query failures, {delivered} deal alerts delivered. "
+            f"If this weekly email ever stops arriving, the Pi needs attention.")
+    try:
+        alerts.send_plain(cfg, "✅ Flight watcher weekly heartbeat", text)
+    except Exception as e:
+        log.error("heartbeat email failed: %s", e)
+    print(text)
+
+
 def cmd_promos(_args):
     """Check deal-blog feeds for new premium-cabin promo announcements."""
     import os
@@ -621,12 +641,13 @@ def main():
     scan.add_argument("--pulse", action="store_true")
     scan.add_argument("--limit", type=int)
     scan.add_argument("--route")
-    for name in ("report", "status", "healthcheck", "promos", "test-email", "test-notify", "test-sms"):
+    for name in ("report", "status", "healthcheck", "promos", "heartbeat",
+                 "test-email", "test-notify", "test-sms"):
         sub.add_parser(name)
     args = p.parse_args()
     {"scan": cmd_scan, "report": cmd_report, "status": cmd_status, "healthcheck": cmd_healthcheck,
-     "promos": cmd_promos, "test-email": cmd_test_email, "test-notify": cmd_test_notify,
-     "test-sms": cmd_test_sms}[args.cmd](args)
+     "promos": cmd_promos, "heartbeat": cmd_heartbeat, "test-email": cmd_test_email,
+     "test-notify": cmd_test_notify, "test-sms": cmd_test_sms}[args.cmd](args)
 
 
 if __name__ == "__main__":

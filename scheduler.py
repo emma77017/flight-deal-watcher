@@ -49,6 +49,9 @@ def main():
         elif now.hour == HEALTH_HOUR and (now.date(), "health") not in done:
             done.add((now.date(), "health"))
             run("healthcheck")
+        elif now.weekday() == 6 and now.hour == 13 and (now.date(), "heartbeat") not in done:
+            done.add((now.date(), "heartbeat"))
+            run("heartbeat")
         elif time.time() - last_pulse >= PULSE_EVERY_MIN * 60:
             run("scan", "--pulse")
             last_pulse = time.time()
