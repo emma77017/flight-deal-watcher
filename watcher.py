@@ -69,9 +69,16 @@ def email_ready(cfg) -> bool:
 
 
 def _dep_excluded(dep: date, ranges) -> bool:
-    """ranges: [["06-01", "09-10"], ...] month-day windows (year-agnostic)."""
+    """ranges: [["06-01", "09-10"], ...] month-day windows (year-agnostic).
+    A range with start > end wraps around New Year (e.g. ["10-16", "04-14"])."""
     md = dep.strftime("%m-%d")
-    return any(a <= md <= b for a, b in ranges)
+    for a, b in ranges:
+        if a <= b:
+            if a <= md <= b:
+                return True
+        elif md >= a or md <= b:
+            return True
+    return False
 
 
 def build_queries(cfg: dict) -> list[dict]:
@@ -87,6 +94,8 @@ def build_queries(cfg: dict) -> list[dict]:
         step = route.get("departure_step_days", 7)
         lengths = route.get("trip_length_days", [14, 21])
         excl = route.get("exclude_dep_ranges", [])
+        # routes with narrow seasonal windows can look further out than the default
+        end = today + timedelta(days=route.get("window_end_days", s["window_end_days"]))
         qs = []
         dep = start
         while dep <= end:
@@ -112,6 +121,7 @@ def build_queries(cfg: dict) -> list[dict]:
         step = route.get("departure_step_days", 14)
         gaps = route.get("gap_days", [14, 28])
         excl = route.get("exclude_dep_ranges", [])
+        end = today + timedelta(days=route.get("window_end_days", s["window_end_days"]))
         qs = []
         dep = start
         while dep <= end:

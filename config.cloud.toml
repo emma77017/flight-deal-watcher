@@ -211,6 +211,7 @@ seat = "business"
 alert_below = 3500
 departure_step_days = 10
 trip_length_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP: LAX-Shanghai nonstop business"
 
@@ -222,6 +223,7 @@ seat = "economy"
 alert_below = 700
 departure_step_days = 10
 trip_length_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP: LAX-Shanghai nonstop economy"
 
@@ -233,6 +235,7 @@ seat = "business"
 alert_below = 2500
 departure_step_days = 10
 trip_length_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP: super-cheap Tokyo tier"
 
@@ -244,6 +247,7 @@ seat = "business"
 alert_below = 2500
 departure_step_days = 10
 trip_length_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP: super-cheap Tokyo tier"
 
@@ -255,6 +259,7 @@ seat = "business"
 alert_below = 2500
 departure_step_days = 10
 trip_length_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP: super-cheap Hong Kong tier"
 
@@ -266,6 +271,7 @@ seat = "business"
 alert_below = 2400
 departure_step_days = 14
 trip_length_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP: Tijuana-Hainan workaround via Beijing; CBX bridge 30min from San Diego"
 
@@ -276,6 +282,7 @@ seat = "business"
 alert_below = 3500
 departure_step_days = 14
 gap_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP open-jaw: LAX>Tokyo, Japan stop, then Shanghai>LAX home (Tokyo>Shanghai hop self-booked)"
 
@@ -286,8 +293,72 @@ seat = "economy"
 alert_below = 700
 departure_step_days = 14
 gap_days = [17, 21]
+window_end_days = 330
 exclude_dep_ranges = [["06-01", "09-10"]]
 note = "EMMA TRIP open-jaw economy: LAX>Tokyo + Shanghai>LAX"
+
+
+# ============ Emma & husband: Europe trip (economy watches; business pending) ============
+# 14-day trip. Weather rule (32C/5C) allows departures ONLY Apr 15-Jun 15 and
+# Sep 1-Oct 15; the second exclude range wraps New Year. Bars from verified
+# 24-month history: routine sale $440-500 RT, sub-$400 = rare flash.
+[[routes]]
+origin = "SAN"
+destination = "LHR"
+max_stops = 0
+seat = "economy"
+alert_below = 500
+departure_step_days = 10
+trip_length_days = [14]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP: SAN-London nonstop RT (BA sale history: $473)"
+
+[[routes]]
+origin = "LAX"
+destination = "CDG"
+max_stops = 0
+seat = "economy"
+alert_below = 500
+departure_step_days = 10
+trip_length_days = [14]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP: LAX-Paris nonstop RT"
+
+[[routes]]
+origin = "LAX"
+destination = "FCO"
+max_stops = 0
+seat = "economy"
+alert_below = 500
+departure_step_days = 10
+trip_length_days = [14]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP: LAX-Rome nonstop RT (ITA runs 20-40% off codes)"
+
+[[openjaw_routes]]
+legs = [["SAN", "LHR"], ["FCO", "LAX"]]
+max_stops = 0
+seat = "economy"
+alert_below = 800
+departure_step_days = 10
+gap_days = [14]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP Option B: SAN>London out, Rome>LAX home"
+
+[[openjaw_routes]]
+legs = [["SAN", "LHR"], ["CDG", "LAX"]]
+max_stops = 0
+seat = "economy"
+alert_below = 800
+departure_step_days = 10
+gap_days = [14]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP Option B alt: SAN>London out, Paris>LAX home"
 
 [email]
 enabled = true
