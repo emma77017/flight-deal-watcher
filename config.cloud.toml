@@ -9,7 +9,7 @@ window_end_days = 180
 adults = 2
 seat = "business"
 currency = "USD"
-max_queries_per_run = 1400
+max_queries_per_run = 1500
 one_way_fallback = true
 delay_seconds = [1.5, 4.0]
 
@@ -348,6 +348,32 @@ gap_days = [13, 14, 15]
 window_end_days = 330
 exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
 note = "EUROPE TRIP Option A premium economy: LAX>Paris out, Rome>LAX home"
+
+
+# Mixed-cabin combos: premium economy on the overnight flight OUT (sleep matters
+# eastbound), economy on the daytime flight home. Today ~$2,362 (B) / $1,782 (A);
+# a dual sale should reach $1,200-1,400.
+[[openjaw_routes]]
+legs = [["SAN", "LHR"], ["FCO", "LAX"]]
+max_stops = 0
+seats = ["premium-economy", "economy"]
+alert_below = 1400
+departure_step_days = 14
+gap_days = [13, 14, 15]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP Option B mixed: PE out to London, economy home from Rome"
+
+[[openjaw_routes]]
+legs = [["LAX", "CDG"], ["FCO", "LAX"]]
+max_stops = 0
+seats = ["premium-economy", "economy"]
+alert_below = 1400
+departure_step_days = 14
+gap_days = [13, 14, 15]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP Option A mixed: PE out to Paris, economy home from Rome"
 
 [email]
 enabled = true

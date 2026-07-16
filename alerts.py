@@ -31,7 +31,8 @@ def build_email(deals: list[dict], adults: int) -> tuple[str, str, str]:
     """Returns (subject, plain_text, html)."""
     best = min(deals, key=lambda d: d["price_pp"])
     cabins = {d.get("cabin", "business") for d in deals}
-    cabin_label = f"{next(iter(cabins))}-class" if len(cabins) == 1 else "flight"
+    only = next(iter(cabins)) if len(cabins) == 1 else None
+    cabin_label = f"{only}-class" if only and " " not in only else (only or "flight")
     subject = (f"✈️ {len(deals)} {cabin_label} deal{'s' if len(deals) > 1 else ''} "
                f"— {best['origin']}→{best['destination']} ${best['price_pp']:,}/person round trip")
 

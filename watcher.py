@@ -141,7 +141,9 @@ def build_queries(cfg: dict) -> list[dict]:
                     "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
                     "ow_fallback": False,
                     "alert_below": route.get("alert_below", cfg["deal"]["max_price_per_person"]),
-                    "seat": route.get("seat", s.get("seat", "business")),
+                    # mixed-cabin open-jaws: seats = [outbound_cabin, return_cabin]
+                    "seat": (route.get("seats") or [route.get("seat", s.get("seat", "business"))] * 2)[0],
+                    "seat2": (route.get("seats") or [route.get("seat", s.get("seat", "business"))] * 2)[1],
                     "note": route.get("note", "open-jaw"),
                 })
             dep += timedelta(days=step)
@@ -210,10 +212,11 @@ def combine_one_ways(q, res_out, res_ret, deal_cfg, adults) -> dict | None:
         "url": res_out.url, "url_ret": res_ret.url,
         "note": (q["note"] + "; " if q["note"] else "")
                 + f"two one-way tickets; return {'/'.join(r.airlines)}{ret_stop}",
-        "cabin": q.get("seat", "business"),
+        "cabin": (q.get("seat", "business") if q.get("seat2", q.get("seat")) == q.get("seat")
+                  else f"{q.get('seat')} out + {q.get('seat2')} home"),
         # dates deliberately NOT in the key: the same flight combo on other dates
         # is the same deal - alert once, re-alert only on a real price drop
-        "key": f"{q['origin']}-{q['destination']}|{q.get('seat', 'business')}|"
+        "key": f"{q['origin']}-{q['destination']}|{q.get('seat', 'business')}+{q.get('seat2', q.get('seat', 'business'))}|"
                f"OW:{'/'.join(sorted(o.airlines))}+{'/'.join(sorted(r.airlines))}",
     }
 
@@ -329,7 +332,7 @@ def cmd_scan(args):
                 time.sleep(random.uniform(dmin, dmax))
                 res_ret = search_round_trip(
                     o2, d2, q["ret_date"], None,
-                    adults=adults, seat=q["seat"],
+                    adults=adults, seat=q.get("seat2", q["seat"]),
                     currency=s.get("currency", "USD"), max_stops=q["max_stops"])
                 consecutive_failures = 0
                 if res_out.itineraries and res_ret.itineraries:
