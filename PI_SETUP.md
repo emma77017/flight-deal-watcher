@@ -100,6 +100,15 @@ The scheduler inside the container runs: full scan 8:00/20:00, pulse every 2h,
 healthcheck at noon (Pacific time, set in docker-compose.yml). It starts with a
 pulse immediately, so within ~10 minutes `status` should show a completed run.
 
+## Step 6.5 — Make it self-updating (one command)
+
+```bash
+cd ~/flight-deal-watcher && sudo bash install_selfupdate.sh
+```
+
+From then on the Pi checks GitHub every 3 hours (and after every reboot) and
+rebuilds itself whenever routes/thresholds/code change — no SSH needed ever again.
+
 ## Step 7 — Living with it
 
 - **Reboots/power cuts:** nothing to do. Docker starts on boot and
