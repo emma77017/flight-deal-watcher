@@ -17,7 +17,8 @@ def deal_line(d) -> str:
     """One-line plain-text summary of a deal dict."""
     stops = "nonstop" if d["stops"] == 0 else f"1 stop {d['stop_airport']} ({fmt_duration(d['layover_min'])})"
     line = (f"{d['origin']}->{d['destination']} {d['dep_date']} - {d['ret_date']}  "
-            f"${d['price_pp']:,}/person RT  {', '.join(d['airlines'])}  {stops}  "
+            f"${d['price_pp']:,}/person RT  {', '.join(d['airlines'])} "
+            f"[{d.get('cabin', 'business')}]  {stops}  "
             f"outbound {fmt_duration(d['total_duration_min'])}")
     if d.get("typical_low_pp"):
         line += f"  (typical ${d['typical_low_pp']:,}-${d['typical_high_pp']:,})"
@@ -53,7 +54,7 @@ def build_email(deals: list[dict], adults: int) -> tuple[str, str, str]:
             <span style="color:#6b7280;font-size:13px">{d['dep_date']} → {d['ret_date']}</span>{note}
           </td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb">
-            {', '.join(d['airlines'])}<br>
+            {', '.join(d['airlines'])} · {d.get('cabin', 'business')}<br>
             <span style="color:#6b7280;font-size:13px">{stops} · outbound {fmt_duration(d['total_duration_min'])}</span>
           </td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap">

@@ -68,6 +68,12 @@ def email_ready(cfg) -> bool:
     return bool(e.get("enabled")) and bool((e.get("app_password") or "").strip())
 
 
+def _dep_excluded(dep: date, ranges) -> bool:
+    """ranges: [["06-01", "09-10"], ...] month-day windows (year-agnostic)."""
+    md = dep.strftime("%m-%d")
+    return any(a <= md <= b for a, b in ranges)
+
+
 def build_queries(cfg: dict) -> list[dict]:
     """Expand routes x departure dates x trip lengths into a query list,
     round-robin interleaved across routes so an aborted run still covers every route."""
@@ -80,20 +86,23 @@ def build_queries(cfg: dict) -> list[dict]:
     for route in cfg["routes"]:
         step = route.get("departure_step_days", 7)
         lengths = route.get("trip_length_days", [14, 21])
+        excl = route.get("exclude_dep_ranges", [])
         qs = []
         dep = start
         while dep <= end:
-            for length in lengths:
-                qs.append({
-                    "origin": route["origin"],
-                    "destination": route["destination"],
-                    "dep_date": dep.isoformat(),
-                    "ret_date": (dep + timedelta(days=length)).isoformat(),
-                    "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
-                    "ow_fallback": route.get("one_way_fallback", True),
-                    "alert_below": route.get("alert_below", cfg["deal"]["max_price_per_person"]),
-                    "note": route.get("note", ""),
-                })
+            if not _dep_excluded(dep, excl):
+                for length in lengths:
+                    qs.append({
+                        "origin": route["origin"],
+                        "destination": route["destination"],
+                        "dep_date": dep.isoformat(),
+                        "ret_date": (dep + timedelta(days=length)).isoformat(),
+                        "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
+                        "ow_fallback": route.get("one_way_fallback", True),
+                        "alert_below": route.get("alert_below", cfg["deal"]["max_price_per_person"]),
+                        "seat": route.get("seat", s.get("seat", "business")),
+                        "note": route.get("note", ""),
+                    })
             dep += timedelta(days=step)
         per_route.append(qs)
 
@@ -102,9 +111,13 @@ def build_queries(cfg: dict) -> list[dict]:
         (o1, d1), (o2, d2) = route["legs"]
         step = route.get("departure_step_days", 14)
         gaps = route.get("gap_days", [14, 28])
+        excl = route.get("exclude_dep_ranges", [])
         qs = []
         dep = start
         while dep <= end:
+            if _dep_excluded(dep, excl):
+                dep += timedelta(days=step)
+                continue
             for gap in gaps:
                 qs.append({
                     "type": "openjaw",
@@ -118,6 +131,7 @@ def build_queries(cfg: dict) -> list[dict]:
                     "max_stops": route.get("max_stops", cfg["deal"]["max_stops"]),
                     "ow_fallback": False,
                     "alert_below": route.get("alert_below", cfg["deal"]["max_price_per_person"]),
+                    "seat": route.get("seat", s.get("seat", "business")),
                     "note": route.get("note", "open-jaw"),
                 })
             dep += timedelta(days=step)
@@ -186,9 +200,10 @@ def combine_one_ways(q, res_out, res_ret, deal_cfg, adults) -> dict | None:
         "url": res_out.url, "url_ret": res_ret.url,
         "note": (q["note"] + "; " if q["note"] else "")
                 + f"two one-way tickets; return {'/'.join(r.airlines)}{ret_stop}",
+        "cabin": q.get("seat", "business"),
         # dates deliberately NOT in the key: the same flight combo on other dates
         # is the same deal - alert once, re-alert only on a real price drop
-        "key": f"{q['origin']}-{q['destination']}|"
+        "key": f"{q['origin']}-{q['destination']}|{q.get('seat', 'business')}|"
                f"OW:{'/'.join(sorted(o.airlines))}+{'/'.join(sorted(r.airlines))}",
     }
 
@@ -299,12 +314,12 @@ def cmd_scan(args):
                 o2, d2 = q["leg2"]
                 res_out = search_round_trip(
                     q["origin"], first_dest, q["dep_date"], None,
-                    adults=adults, seat=s.get("seat", "business"),
+                    adults=adults, seat=q["seat"],
                     currency=s.get("currency", "USD"), max_stops=q["max_stops"])
                 time.sleep(random.uniform(dmin, dmax))
                 res_ret = search_round_trip(
                     o2, d2, q["ret_date"], None,
-                    adults=adults, seat=s.get("seat", "business"),
+                    adults=adults, seat=q["seat"],
                     currency=s.get("currency", "USD"), max_stops=q["max_stops"])
                 consecutive_failures = 0
                 if res_out.itineraries and res_ret.itineraries:
@@ -344,7 +359,7 @@ def cmd_scan(args):
             try:
                 res = search_round_trip(
                     q["origin"], q["destination"], q["dep_date"], q["ret_date"],
-                    adults=adults, seat=s.get("seat", "business"),
+                    adults=adults, seat=q["seat"],
                     currency=s.get("currency", "USD"), max_stops=q["max_stops"],
                 )
                 consecutive_failures = 0
@@ -393,8 +408,9 @@ def cmd_scan(args):
                         "dep_date": q["dep_date"], "ret_date": q["ret_date"],
                         "typical_low_pp": t_low, "typical_high_pp": t_high,
                         "url": res.url, "note": q["note"],
+                        "cabin": q["seat"],
                         # same flight on other dates = same deal (no dates in key)
-                        "key": f"{q['origin']}-{q['destination']}|{akey}",
+                        "key": f"{q['origin']}-{q['destination']}|{q['seat']}|{akey}",
                         # the golden deal - Shanghai-LA nonstop - may repeat daily
                         "golden": q["origin"] == "PVG" and q["destination"] == "LAX" and d["stops"] == 0,
                     })
@@ -406,12 +422,12 @@ def cmd_scan(args):
                 time.sleep(random.uniform(dmin, dmax))
                 res_out = search_round_trip(
                     q["origin"], q["destination"], q["dep_date"], None,
-                    adults=adults, seat=s.get("seat", "business"),
+                    adults=adults, seat=q["seat"],
                     currency=s.get("currency", "USD"), max_stops=q["max_stops"])
                 time.sleep(random.uniform(dmin, dmax))
                 res_ret = search_round_trip(
                     q["destination"], q["origin"], q["ret_date"], None,
-                    adults=adults, seat=s.get("seat", "business"),
+                    adults=adults, seat=q["seat"],
                     currency=s.get("currency", "USD"), max_stops=q["max_stops"])
                 if res_out.itineraries and res_ret.itineraries:
                     cheapest_sum = round((min(i.price_total for i in res_out.itineraries)

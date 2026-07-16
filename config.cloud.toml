@@ -9,7 +9,7 @@ window_end_days = 180
 adults = 2
 seat = "business"
 currency = "USD"
-max_queries_per_run = 1000
+max_queries_per_run = 1200
 one_way_fallback = true
 delay_seconds = [1.5, 4.0]
 
@@ -199,6 +199,95 @@ departure_step_days = 21
 gap_days = [21, 28]
 max_stops = 0
 note = "open-jaw: LA in, Seattle home, all nonstop"
+
+
+# ================== Emma & husband: China trip ==================
+# 17-21 day stays; departures excluded Jun 1 - Sep 10 (too hot).
+[[routes]]
+origin = "LAX"
+destination = "PVG"
+max_stops = 0
+seat = "business"
+alert_below = 3500
+departure_step_days = 10
+trip_length_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP: LAX-Shanghai nonstop business"
+
+[[routes]]
+origin = "LAX"
+destination = "PVG"
+max_stops = 0
+seat = "economy"
+alert_below = 700
+departure_step_days = 10
+trip_length_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP: LAX-Shanghai nonstop economy"
+
+[[routes]]
+origin = "LAX"
+destination = "NRT"
+max_stops = 0
+seat = "business"
+alert_below = 2500
+departure_step_days = 10
+trip_length_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP: super-cheap Tokyo tier"
+
+[[routes]]
+origin = "LAX"
+destination = "HND"
+max_stops = 0
+seat = "business"
+alert_below = 2500
+departure_step_days = 10
+trip_length_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP: super-cheap Tokyo tier"
+
+[[routes]]
+origin = "LAX"
+destination = "HKG"
+max_stops = 0
+seat = "business"
+alert_below = 2500
+departure_step_days = 10
+trip_length_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP: super-cheap Hong Kong tier"
+
+[[routes]]
+origin = "TIJ"
+destination = "PVG"
+max_stops = 1
+seat = "business"
+alert_below = 2400
+departure_step_days = 14
+trip_length_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP: Tijuana-Hainan workaround via Beijing; CBX bridge 30min from San Diego"
+
+[[openjaw_routes]]
+legs = [["LAX", "NRT"], ["PVG", "LAX"]]
+max_stops = 0
+seat = "business"
+alert_below = 3500
+departure_step_days = 14
+gap_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP open-jaw: LAX>Tokyo, Japan stop, then Shanghai>LAX home (Tokyo>Shanghai hop self-booked)"
+
+[[openjaw_routes]]
+legs = [["LAX", "NRT"], ["PVG", "LAX"]]
+max_stops = 0
+seat = "economy"
+alert_below = 700
+departure_step_days = 14
+gap_days = [17, 21]
+exclude_dep_ranges = [["06-01", "09-10"]]
+note = "EMMA TRIP open-jaw economy: LAX>Tokyo + Shanghai>LAX"
 
 [email]
 enabled = true
