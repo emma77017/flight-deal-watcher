@@ -302,116 +302,40 @@ note = "EMMA TRIP open-jaw economy: LAX>Tokyo + Shanghai>LAX"
 # 14-day trip. Weather rule (32C/5C) allows departures ONLY Apr 15-Jun 15 and
 # Sep 1-Oct 15; the second exclude range wraps New Year. Bars from verified
 # 24-month history: routine sale $440-500 RT, sub-$400 = rare flash.
-[[routes]]
-origin = "SAN"
-destination = "LHR"
-max_stops = 0
-seat = "economy"
-alert_below = 500
-departure_step_days = 10
-trip_length_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP: SAN-London nonstop RT (BA sale history: $473)"
-
-[[routes]]
-origin = "LAX"
-destination = "CDG"
-max_stops = 0
-seat = "economy"
-alert_below = 500
-departure_step_days = 10
-trip_length_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP: LAX-Paris nonstop RT"
-
-[[routes]]
-origin = "LAX"
-destination = "FCO"
-max_stops = 0
-seat = "economy"
-alert_below = 500
-departure_step_days = 10
-trip_length_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP: LAX-Rome nonstop RT (ITA runs 20-40% off codes)"
-
 [[openjaw_routes]]
 legs = [["SAN", "LHR"], ["FCO", "LAX"]]
 max_stops = 0
 seat = "economy"
 alert_below = 800
-departure_step_days = 10
-gap_days = [14]
+departure_step_days = 14
+gap_days = [13, 14, 15]
 window_end_days = 330
 exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
 note = "EUROPE TRIP Option B: SAN>London out, Rome>LAX home"
-
-[[openjaw_routes]]
-legs = [["SAN", "LHR"], ["CDG", "LAX"]]
-max_stops = 0
-seat = "economy"
-alert_below = 800
-departure_step_days = 10
-gap_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP Option B alt: SAN>London out, Paris>LAX home"
-
-
-# Europe business watches. History calibration (Jul 2026): BA Club World sales
-# run $2,900-3,009 ex-NYC (ex-West-Coast typically +$300-500); ITA 20-40% codes
-# land ~$3,400-3,800 ex-LAX; Condor's recurring FRA deals hit $2,266-2,600 (NYC)
-# / ~$2,595+ (LAX). Ex-Europe one-way business (~$2,700-2,900 LHR-LAX) is normal,
-# not a sale. Bar $3,000 = genuine-sale tier for the nonstop doors we care about.
-[[routes]]
-origin = "SAN"
-destination = "LHR"
-max_stops = 0
-seat = "business"
-alert_below = 3000
-departure_step_days = 10
-trip_length_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP: SAN-London business"
-
-[[routes]]
-origin = "LAX"
-destination = "CDG"
-max_stops = 0
-seat = "business"
-alert_below = 3000
-departure_step_days = 10
-trip_length_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP: LAX-Paris business"
-
-[[routes]]
-origin = "LAX"
-destination = "FCO"
-max_stops = 0
-seat = "business"
-alert_below = 3000
-departure_step_days = 10
-trip_length_days = [14]
-window_end_days = 330
-exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP: LAX-Rome business (ITA code sales land ~3400-3800)"
 
 [[openjaw_routes]]
 legs = [["SAN", "LHR"], ["FCO", "LAX"]]
 max_stops = 0
 seat = "business"
 alert_below = 3500
-departure_step_days = 10
-gap_days = [14]
+departure_step_days = 14
+gap_days = [13, 14, 15]
 window_end_days = 330
 exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
 note = "EUROPE TRIP Option B business: anomaly net (one-way sums rarely qualify)"
+
+
+# Option A combo: LAX>Paris out + Rome>LAX home, 14 +/- 1 days
+[[openjaw_routes]]
+legs = [["LAX", "CDG"], ["FCO", "LAX"]]
+max_stops = 0
+seat = "economy"
+alert_below = 800
+departure_step_days = 14
+gap_days = [13, 14, 15]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP Option A: LAX>Paris out, Rome>LAX home"
 
 [email]
 enabled = true
