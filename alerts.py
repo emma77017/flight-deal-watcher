@@ -30,7 +30,9 @@ def deal_line(d) -> str:
 def build_email(deals: list[dict], adults: int) -> tuple[str, str, str]:
     """Returns (subject, plain_text, html)."""
     best = min(deals, key=lambda d: d["price_pp"])
-    subject = (f"✈️ {len(deals)} business-class deal{'s' if len(deals) > 1 else ''} "
+    cabins = {d.get("cabin", "business") for d in deals}
+    cabin_label = f"{next(iter(cabins))}-class" if len(cabins) == 1 else "flight"
+    subject = (f"✈️ {len(deals)} {cabin_label} deal{'s' if len(deals) > 1 else ''} "
                f"— {best['origin']}→{best['destination']} ${best['price_pp']:,}/person round trip")
 
     text_lines = [f"Found {len(deals)} qualifying business-class fare(s), priced for {adults} travelers:", ""]
@@ -71,7 +73,7 @@ def build_email(deals: list[dict], adults: int) -> tuple[str, str, str]:
 
     html = f"""
     <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px">
-      <h2 style="margin:0 0 4px">✈️ Business-class deals found</h2>
+      <h2 style="margin:0 0 4px">✈️ {cabin_label.capitalize()} deal{'s' if len(deals) > 1 else ''} found</h2>
       <p style="color:#6b7280;margin:0 0 16px">Round-trip, taxes included, priced for {adults} travelers
       (shown per person). Prices move fast — verify on Google Flights before booking.</p>
       <table style="border-collapse:collapse;width:100%">{''.join(rows)}</table>
