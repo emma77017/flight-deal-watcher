@@ -316,13 +316,13 @@ note = "EUROPE TRIP Option B: SAN>London out, Rome>LAX home"
 [[openjaw_routes]]
 legs = [["SAN", "LHR"], ["FCO", "LAX"]]
 max_stops = 0
-seat = "business"
-alert_below = 3500
+seat = "premium-economy"
+alert_below = 2200
 departure_step_days = 14
 gap_days = [13, 14, 15]
 window_end_days = 330
 exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
-note = "EUROPE TRIP Option B business: anomaly net (one-way sums rarely qualify)"
+note = "EUROPE TRIP Option B premium economy: today ~$3,294 sum; sales should reach ~$2,000-2,200"
 
 
 # Option A combo: LAX>Paris out + Rome>LAX home, 14 +/- 1 days
@@ -336,6 +336,18 @@ gap_days = [13, 14, 15]
 window_end_days = 330
 exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
 note = "EUROPE TRIP Option A: LAX>Paris out, Rome>LAX home"
+
+
+[[openjaw_routes]]
+legs = [["LAX", "CDG"], ["FCO", "LAX"]]
+max_stops = 0
+seat = "premium-economy"
+alert_below = 2200
+departure_step_days = 14
+gap_days = [13, 14, 15]
+window_end_days = 330
+exclude_dep_ranges = [["06-16", "08-31"], ["10-16", "04-14"]]
+note = "EUROPE TRIP Option A premium economy: LAX>Paris out, Rome>LAX home"
 
 [email]
 enabled = true
